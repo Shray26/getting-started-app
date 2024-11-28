@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "appu883/simple_app" // Docker image name
-        DOCKER_CREDENTIALS_ID = "dockerhub-token" // Credentials ID for Docker Hub
+        DOCKER_IMAGE = "appu883/simple_app" 
+        DOCKER_CREDENTIALS_ID = "dockerhub-token" 
     }
 
     stages {
