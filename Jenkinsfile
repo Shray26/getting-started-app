@@ -65,7 +65,7 @@ pipeline {
         }
         always {
             echo "Cleaning up unused Docker images..."
-            sh "docker image prune -f" // Removes unused Docker images to free up space
+            sh "docker image prune -f" 
         }
     }
 }
