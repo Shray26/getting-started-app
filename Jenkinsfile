@@ -3,8 +3,9 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "appu883/simple_app"
-        DOCKER_CREDENTIALS_ID = "dockerhub-cred" // Use the token's credentials ID
+        DOCKER_CREDENTIALS_ID = "dockerhub-token" // Use the token's credentials ID
     }
+
     stages {
         stage('Git Checkout') {
             steps {
