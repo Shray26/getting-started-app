@@ -6,6 +6,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/appu883/getting-started-app.git'
             }
         }
+        
         stage('Image Build') {
             steps {
                 sh 'docker image build -t appu883/simple_app:v$BUILD_ID .'
