@@ -4,9 +4,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = "appu883/simple_app"
         DOCKER_CREDENTIALS_ID = "dockerhub-token"
-        SSH_CREDENTIALS_ID = "ssh_key"  // 
-        SERVER_2_USER = "ubuntu"  
-        SERVER_2_IP = "172.31.5.201"      
+        SSH_CREDENTIALS_ID = "ssh_key"
+        SERVER_2_USER = "ubuntu"
+        SERVER_2_IP = "172.31.5.201"
     }
 
     stages {
@@ -16,14 +16,16 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/appu883/getting-started-app.git'
             }
         }
-        
+
         stage('Image Build') {
             steps {
                 echo "Building the Docker image..."
-                sh """
-                docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} . 
-                docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
-                """
+                script {
+                    sh """
+                    docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} . 
+                    docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
+                    """
+                }
             }
         }
 
