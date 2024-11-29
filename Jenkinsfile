@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     // Use Jenkins tool configuration for Docker
-                    def dockerTool = tool name: 'DockerTool', type: 'Tool'
+                    def dockerTool = tool name: 'docker', type: 'Tool'
                     // Build the Docker image
                     sh """
                         ${dockerTool}/bin/docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} .
