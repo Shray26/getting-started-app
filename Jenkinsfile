@@ -10,33 +10,37 @@ pipeline {
     }
 
     stages {
-        stage('Git Checkout') {
+        stage('Source Code Checkout') {
             steps {
                 script {
-                    git branch: 'main', url: 'https://github.com/Shray26/getting-started-app.git'
+                    // Git Checkout from repository
+                    checkout scm
                 }
             }
         }
 
-stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
+                    // Use Jenkins tool configuration for Docker
+                    def dockerTool = tool name: 'DockerTool', type: 'Tool'
+                    // Build the Docker image
                     sh """
-                    def dockerTool = tool 'docker'
-                    sh "${dockerTool}/bin/docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} ."
-                    sh "${dockerTool}/bin/docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest"
+                        ${dockerTool}/bin/docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} .
+                        ${dockerTool}/bin/docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
                     """
                 }
             }
         }
 
-        stage('Push Image to Docker Hub') {
+        stage('Push Docker Image to Hub') {
             steps {
                 script {
+                    // Using Docker registry credentials to push the image
                     withDockerRegistry(credentialsId: "${DOCKER_CREDENTIALS_ID}", url: 'https://index.docker.io/v1/') {
                         sh """
-                        docker push ${DOCKER_IMAGE}:v${BUILD_ID}
-                        docker push ${DOCKER_IMAGE}:latest
+                            docker push ${DOCKER_IMAGE}:v${BUILD_ID}
+                            docker push ${DOCKER_IMAGE}:latest
                         """
                     }
                 }
@@ -46,15 +50,15 @@ stage('Build Docker Image') {
         stage('Deploy to Server 2') {
             steps {
                 script {
-
+                    // SSH into the server and deploy the Docker image
                     sshagent([SSH_CREDENTIALS_ID]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ${SERVER_2_USER}@${SERVER_2_IP} '
-                            docker pull ${DOCKER_IMAGE}:latest && 
-                            docker stop todoapp || true &&
-                            docker rm todoapp || true &&
-                            docker run -d --name todoapp -p 3000:3000 ${DOCKER_IMAGE}:latest
-                        '
+                            ssh -o StrictHostKeyChecking=no ${SERVER_2_USER}@${SERVER_2_IP} '
+                                docker pull ${DOCKER_IMAGE}:latest &&
+                                docker stop todoapp || true &&
+                                docker rm todoapp || true &&
+                                docker run -d --name todoapp -p 3000:3000 ${DOCKER_IMAGE}:latest
+                            '
                         """
                     }
                 }
