@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo "Deploying the Docker image to Server 2..."
 
-                // Use SSH credentials to connect to Server 2 and deploy the container
+                
                 sshagent([SSH_CREDENTIALS_ID]) {
                     sh """
                     ssh -o StrictHostKeyChecking=no ${SERVER_2_USER}@${SERVER_2_IP} '
