@@ -18,12 +18,13 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+stage('Build Docker Image') {
             steps {
                 script {
                     sh """
-                    docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} . 
-                    docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
+                    def dockerTool = tool 'Dockertool'
+                    sh "${dockerTool}/bin/docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} .
+                    sh "${dockerTool}/bin/docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
                     """
                 }
             }
