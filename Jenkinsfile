@@ -2,8 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "appu883/simple_app" 
-        DOCKER_CREDENTIALS_ID = "dockerhub-token" 
+        DOCKER_IMAGE = "appu883/simple_app"
+        DOCKER_CREDENTIALS_ID = "dockerhub-token"  // Replace with your Docker Hub credentials
+        SSH_USER = "ubuntu"
+        SERVER_IP = "172.31.5.201"  // Replace with your Server 2 IP address
     }
 
     stages {
@@ -36,21 +38,16 @@ pipeline {
             }
         }
 
-        stage('Cleanup Existing Container') {
+        stage('Deploy to Remote Server') {
             steps {
-                echo "Stopping and removing any existing container..."
+                echo "Deploying the app to the remote server..."
                 sh """
+                ssh ${SSH_USER}@${SERVER_IP} << EOF
+                docker pull ${DOCKER_IMAGE}:latest
                 docker stop todoapp || true
                 docker rm todoapp || true
-                """
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                echo "Running the Docker container..."
-                sh """
                 docker run -itd --name todoapp -p 3000:3000 ${DOCKER_IMAGE}:latest
+                EOF
                 """
             }
         }
@@ -58,14 +55,14 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully. The container is running, and the image has been pushed to Docker Hub."
+            echo "Pipeline completed successfully. The app is deployed and accessible via the browser."
         }
         failure {
             echo "Pipeline failed. Check the logs for details."
         }
         always {
             echo "Cleaning up unused Docker images..."
-            sh "docker image prune -f" 
+            sh "docker image prune -f"
         }
     }
 }
