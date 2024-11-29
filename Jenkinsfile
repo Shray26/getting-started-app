@@ -13,7 +13,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 script {
-                    git branch: 'main', url: 'https://github.com/Shray26/my-app.git'
+                    git branch: 'main', url: 'https://github.com/Shray26/getting-started-app.git'
                 }
             }
         }
