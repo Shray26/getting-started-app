@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "appu883/simple_app"
         DOCKER_CREDENTIALS_ID = "dockerhub-token"
+        SSH_CREDENTIALS_ID = "ssh_key"  // 
         SERVER_2_USER = "ubuntu"  
         SERVER_2_IP = "172.31.5.201"      
     }
@@ -20,7 +21,7 @@ pipeline {
             steps {
                 echo "Building the Docker image..."
                 sh """
-                docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} .
+                docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} . 
                 docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
                 """
             }
@@ -61,15 +62,17 @@ pipeline {
             steps {
                 echo "Deploying the Docker image to Server 2..."
 
-                // SSH into Server 2, pull the image from Docker Hub, and run the container
-                sh """
-                ssh -o StrictHostKeyChecking=no ${SERVER_2_USER}@${SERVER_2_IP} '
-                    docker pull ${DOCKER_IMAGE}:latest && 
-                    docker stop todoapp || true &&
-                    docker rm todoapp || true &&
-                    docker run -d --name todoapp -p 3000:3000 ${DOCKER_IMAGE}:latest
-                '
-                """
+                // Use SSH credentials to connect to Server 2 and deploy the container
+                sshagent([SSH_CREDENTIALS_ID]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${SERVER_2_USER}@${SERVER_2_IP} '
+                        docker pull ${DOCKER_IMAGE}:latest && 
+                        docker stop todoapp || true &&
+                        docker rm todoapp || true &&
+                        docker run -d --name todoapp -p 3000:3000 ${DOCKER_IMAGE}:latest
+                    '
+                    """
+                }
             }
         }
     }
