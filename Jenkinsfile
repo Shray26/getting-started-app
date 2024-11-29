@@ -22,7 +22,7 @@ stage('Build Docker Image') {
             steps {
                 script {
                     sh """
-                    def dockerTool = tool 'Dockertool'
+                    def dockerTool = tool 'docker'
                     sh "${dockerTool}/bin/docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} .
                     sh "${dockerTool}/bin/docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
                     """
