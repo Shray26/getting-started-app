@@ -13,7 +13,6 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 script {
-                    echo "Checking out the repository..."
                     git branch: 'main', url: 'https://github.com/Shray26/my-app.git'
                 }
             }
@@ -22,7 +21,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building the Docker image..."
                     sh """
                     docker image build -t ${DOCKER_IMAGE}:v${BUILD_ID} . 
                     docker image tag ${DOCKER_IMAGE}:v${BUILD_ID} ${DOCKER_IMAGE}:latest
@@ -34,7 +32,6 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 script {
-                    echo "Pushing Docker image to Docker Hub..."
                     withDockerRegistry(credentialsId: "${DOCKER_CREDENTIALS_ID}", url: 'https://index.docker.io/v1/') {
                         sh """
                         docker push ${DOCKER_IMAGE}:v${BUILD_ID}
@@ -48,7 +45,6 @@ pipeline {
         stage('Deploy to Server 2') {
             steps {
                 script {
-                    echo "Deploying Docker image to Server 2..."
 
                     sshagent([SSH_CREDENTIALS_ID]) {
                         sh """
